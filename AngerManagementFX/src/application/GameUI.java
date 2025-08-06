@@ -11,11 +11,18 @@ import javafx.scene.layout.*;
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+
 
 import java.io.File;
 
 public class GameUI {
+	private Stage primaryStage;
     private BorderPane root;
     private Player player1;
     private Player player2;
@@ -36,6 +43,11 @@ public class GameUI {
 
     private MediaPlayer bgMusic;
     private AudioClip punchSound, kickSound, slapSound;
+    
+    private int angerScore;
+    private int confidenceScore;
+    private int satisfactionScore;
+    private int additionalScore;
 
     public GameUI() {
     	
@@ -149,6 +161,13 @@ public class GameUI {
     private void handleGiveUp(Player quitter) {
         showMessage(p1MessageLabel, quitter.getName() + " gave up!");
         disableAllButtons();
+        if(quitter == player1) {
+        	showEndGamePopup("Player 2");	
+        }
+        else {
+        	showEndGamePopup("Player 1");
+        }
+        
     }
 
     private void loadSounds() {
@@ -195,25 +214,36 @@ public class GameUI {
     private void selectMove(String player, String move) {
         if (player.equals("Player 1") && player1Move.isEmpty()) {
             player1Move = move;
+            showMessage(p1MessageLabel, "Player 1 chose " + capitalize(player1Move));
         } else if (player.equals("Player 2") && player2Move.isEmpty()) {
             player2Move = move;
+            showMessage(p2MessageLabel, "Player 2 chose " + capitalize(player2Move));
         }
 
         if (!player1Move.isEmpty() && !player2Move.isEmpty()) {
             GameLogic.Result result = GameLogic.determineWinner(player1Move, player2Move);
+
             if (result == GameLogic.Result.DRAW) {
                 showMessage(p1MessageLabel, "Draw!");
                 showMessage(p2MessageLabel, "Draw!");
                 resetMoves();
             } else {
                 if (result == GameLogic.Result.P1_WIN) {
+                    showMessage(p1MessageLabel, "Player 1 won this round!");
                     showActionButtons(player1, player2, p1MessageLabel);
                 } else {
+                    showMessage(p2MessageLabel, "Player 2 won this round!");
                     showActionButtons(player2, player1, p2MessageLabel);
                 }
             }
         }
     }
+
+    private String capitalize(String word) {
+        if (word == null || word.isEmpty()) return "";
+        return word.substring(0, 1).toUpperCase() + word.substring(1);
+    }
+
 
     private void showActionButtons(Player winner, Player loser, Label messageLabel) {
         actionButtonsBox.getChildren().clear();
@@ -230,22 +260,64 @@ public class GameUI {
         imgView.setFitWidth(80);
         imgView.setFitHeight(80);
         imgView.setOnMouseClicked(e -> {
-            winner.incrementScore();
+
+            int basePoints = 0;
+
             winner.changeStateOfMind("confidence", +10);
-            winner.changeStateOfMind("anger", -10);
             winner.changeStateOfMind("satisfaction", +5);
-            loser.changeStateOfMind("anger", +10);
+            winner.changeStateOfMind("anger", -10);
+            
+            loser.changeStateOfMind("confidence", -10);
             loser.changeStateOfMind("satisfaction", -5);
+            loser.changeStateOfMind("anger", +10);
+
+            // Psychorithm
+            switch (action) {
+                case "Slap":
+                	winner.changeStateOfMind("satisfaction", +15);
+                    loser.changeStateOfMind("confidence", -15);
+                    angerScore = winner.getAnger();
+                    satisfactionScore = winner.getSatisfaction();
+                    confidenceScore = winner.getConfidence();
+                    additionalScore = (int) Math.ceil(angerScore * 0.05) - (int) Math.ceil(satisfactionScore * 0.025) - (int) Math.ceil(confidenceScore * 0.01);
+                    basePoints = 1 + additionalScore;
+                    break;
+                case "Punch":
+                    winner.changeStateOfMind("confidence", +10); 
+                    loser.changeStateOfMind("anger", +15);
+                    loser.changeStateOfMind("satisfaction", -10);
+                    angerScore = winner.getAnger();
+                    satisfactionScore = winner.getSatisfaction();
+                    confidenceScore = winner.getConfidence();
+                    additionalScore = (int) Math.ceil(angerScore * 0.05) - (int) Math.ceil(satisfactionScore * 0.025) - (int) Math.ceil(confidenceScore * 0.01);
+                    basePoints = 2 + additionalScore;
+                    break;
+                case "Kick":
+                    loser.changeStateOfMind("anger", +25);
+                    loser.changeStateOfMind("satisfaction", -10);
+                    angerScore = winner.getAnger();
+                    satisfactionScore = winner.getSatisfaction();
+                    confidenceScore = winner.getConfidence();
+                    additionalScore = (int) Math.ceil(angerScore * 0.035) - (int) Math.ceil(satisfactionScore * 0.025) - (int) Math.ceil(confidenceScore * 0.01);
+                    basePoints = 3 + additionalScore;
+                    break;
+            }
+
+            // Final score includes confidence-based bonus
+            int totalPoints = basePoints + (winner.getConfidence() / 50);
+            winner.addScore(totalPoints);
 
             playSound(action);
             showMessage(label, winner.getName() + " " + action.toLowerCase() + "ed " + loser.getName() + "!");
 
             resetMoves();
             actionButtonsBox.getChildren().clear();
+            checkWinCondition();
             GameLogic.nextRound();
+            
             if (roundLabel != null) {
                 roundLabel.setText("Round: " + GameLogic.getRound());
-            } 
+            }
         });
         imgView.getStyleClass().add("image-button");
         return imgView;
@@ -283,8 +355,50 @@ public class GameUI {
             node.setDisable(true);
         }
     }
+    
+    private void checkWinCondition() {
+        if (player1.getScore() >= 50 || player2.getScore() >= 50) {
+            String winnerName = player1.getScore() >= 50 ? player1.getName() : player2.getName();
+            showMessage(p1MessageLabel, winnerName + " wins the game!");
+            showMessage(p2MessageLabel, winnerName + " wins the game!");
+            disableAllButtons();
 
-    public Pane getRoot() {
+            showEndGamePopup(winnerName);
+        }
+    }
+
+    
+    private void showEndGamePopup(String winnerName) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Game Over");
+            alert.setHeaderText("🏆 " + winnerName + " Wins!");
+            alert.setContentText("Congratulations, " + winnerName + "! Thanks for playing Anger Management.");
+
+            ButtonType closeButton = new ButtonType("Close Game", ButtonBar.ButtonData.OK_DONE);
+            alert.getButtonTypes().setAll(closeButton);
+
+            // 🔧 Make sure alert is shown above the main game window
+            if (primaryStage != null) {
+                alert.initOwner(primaryStage);
+            }
+
+            alert.showAndWait().ifPresent(response -> {
+                if (response == closeButton) {
+                    Platform.exit();
+                    System.exit(0);
+                }
+            });
+        });
+    }
+
+
+
+    public Pane getRoot(Stage primaryStage) {
+        this.primaryStage = primaryStage;
         return root;
     }
+
 }
+
+

@@ -7,8 +7,7 @@ import javafx.scene.text.Font;
 
 public class Player {
     private String name;
-    private int score;
-    private int stateOfMind; 
+    private int score; 
     
     private int anger = 50;
     private int satisfaction = 25;
@@ -31,7 +30,6 @@ public class Player {
     public Player(String name) {
         this.name = name;
         this.score = 0;
-        this.stateOfMind = 100;
 
         nameLabel = new Label(name);
         nameLabel.setFont(Font.font("Arial", 18));
@@ -70,26 +68,21 @@ public class Player {
         return score;
     }
 
-    public void incrementScore() {
-        score += (1 + confidence / 50);
-        updateUI();
-    }
-
-    public void changeStateOfMind(int delta) {
-        stateOfMind += delta;
-        if (stateOfMind > 100) stateOfMind = 100;
-        if (stateOfMind < 0) stateOfMind = 0;
-        updateUI();
-    }
-
-    public int getStateOfMind() {
-        return stateOfMind;
-    }
-
     public Label getScoreLabel() {
         return scoreLabel;
     }
-
+    
+    public int getConfidence() {
+        return confidence;
+    }
+    
+    public int getAnger() {
+        return anger;
+    }
+    
+    public int getSatisfaction() {
+        return satisfaction;
+    }
 
     public VBox getUIBox() {
         return uiBox;
@@ -123,6 +116,11 @@ public class Player {
 
     private int clamp(int value) {
         return Math.max(0, Math.min(100, value));
+    }
+    
+    public void addScore(int points) {
+        this.score += points;
+        updateUI();
     }
 
     private void updateUI() {

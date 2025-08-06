@@ -11,7 +11,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
         	GameUI gameUI = new GameUI();
-            Scene scene = new Scene(gameUI.getRoot());
+        	Scene scene = new Scene(gameUI.getRoot(primaryStage));
             scene.getStylesheets().add(getClass().getResource("/application/style.css").toExternalForm());
 
             Rectangle2D screenBounds = Screen.getPrimary().getBounds();
