@@ -120,6 +120,12 @@
     -fx-scale-y: 1.05;
 }
 
+.state-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
 .image-button-container {
     -fx-alignment: center;
     -fx-spacing: 20px;

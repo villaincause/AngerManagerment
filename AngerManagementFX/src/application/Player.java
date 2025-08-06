@@ -20,7 +20,9 @@ public class Player {
     
     private Label nameLabel;
     private Label scoreLabel;
-    private ProgressBar mindBar;
+    Label angerLabel = createStateLabel("Anger");
+    Label satisfactionLabel = createStateLabel("Satisfaction");
+    Label confidenceLabel = createStateLabel("Confidence");
     private VBox uiBox;
 
     public static final String P1_WIN = "P1_WIN";
@@ -38,17 +40,27 @@ public class Player {
         scoreLabel = new Label("Score: 0");
         scoreLabel.getStyleClass().add("score-label");
 
-        mindBar = new ProgressBar(1.0);
         angerBar = createStateBar();
         satisfactionBar = createStateBar();
         confidenceBar = createStateBar();
 
-        mindBar.setPrefWidth(150);
-        mindBar.getStyleClass().add("mind-bar");
+        uiBox = new VBox(5,
+            nameLabel,
+            scoreLabel,
+            angerLabel, angerBar,
+            satisfactionLabel, satisfactionBar,
+            confidenceLabel, confidenceBar
+        );
 
-        uiBox = new VBox(5, nameLabel, scoreLabel, mindBar, angerBar, satisfactionBar, confidenceBar);
         uiBox.getStyleClass().add("player-ui");
     }
+    
+    private Label createStateLabel(String text) {
+        Label label = new Label(text);
+        label.getStyleClass().add("state-label");
+        return label;
+    }
+
 
     public String getName() {
         return name;
@@ -78,9 +90,6 @@ public class Player {
         return scoreLabel;
     }
 
-    public ProgressBar getMindBar() {
-        return mindBar;
-    }
 
     public VBox getUIBox() {
         return uiBox;
@@ -88,7 +97,6 @@ public class Player {
 
     public void setUIBars() {
         scoreLabel.setText("Score: " + score);
-        mindBar.setProgress(stateOfMind / 100.0);
     }
     
     private ProgressBar createStateBar() {
@@ -119,7 +127,6 @@ public class Player {
 
     private void updateUI() {
         scoreLabel.setText("Score: " + score);
-        mindBar.setProgress(stateOfMind / 100.0);
         angerBar.setProgress(anger / 100.0);
         satisfactionBar.setProgress(satisfaction / 100.0);
         confidenceBar.setProgress(confidence / 100.0);

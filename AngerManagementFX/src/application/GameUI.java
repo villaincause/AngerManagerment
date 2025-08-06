@@ -87,12 +87,9 @@ public class GameUI {
         gameStarted = true;
 
         // RoundLabel and title
-        VBox topUI = new VBox(10);
-        topUI.setAlignment(Pos.TOP_CENTER);
-        topUI.setPadding(new Insets(20, 0, 10, 0));
+        VBox topUI = createTopUI();
+        topUI.setPadding(new Insets(20, 0, 10, 0)); // optional
         topUI.getStyleClass().add("round-container");
-
-        topUI.getChildren().addAll(gameTitle, roundLabel);
         BorderPane.setAlignment(topUI, Pos.TOP_CENTER);
         root.setTop(topUI);
 
@@ -134,14 +131,20 @@ public class GameUI {
 
 
     private VBox createTopUI() {
-        HBox messageBox = new HBox(p1MessageLabel, roundLabel, p2MessageLabel);
-        messageBox.setAlignment(Pos.CENTER);
-        messageBox.setSpacing(150);
+        // Round label centered
+        HBox roundBox = new HBox(roundLabel);
+        roundBox.setAlignment(Pos.CENTER);
 
-        VBox topBox = new VBox(gameTitle, messageBox);
+        // Message labels for both players
+        HBox messageBox = new HBox(150, p1MessageLabel, p2MessageLabel); // spacing of 150
+        messageBox.setAlignment(Pos.CENTER);
+
+        // Title on top, then round, then messages
+        VBox topBox = new VBox(10, gameTitle, roundBox, messageBox);
         topBox.setAlignment(Pos.CENTER);
         return topBox;
     }
+
 
     private void handleGiveUp(Player quitter) {
         showMessage(p1MessageLabel, quitter.getName() + " gave up!");
@@ -220,11 +223,6 @@ public class GameUI {
                 createActionButton("punch.jpg", "Punch", winner, loser, messageLabel),
                 createActionButton("slap.jpg", "Slap", winner, loser, messageLabel)
         );
-
-        GameLogic.nextRound();
-        if (roundLabel != null) {
-            roundLabel.setText("Round: " + GameLogic.getRound());
-        }
     }
 
     private ImageView createActionButton(String img, String action, Player winner, Player loser, Label label) {
@@ -244,6 +242,10 @@ public class GameUI {
 
             resetMoves();
             actionButtonsBox.getChildren().clear();
+            GameLogic.nextRound();
+            if (roundLabel != null) {
+                roundLabel.setText("Round: " + GameLogic.getRound());
+            } 
         });
         imgView.getStyleClass().add("image-button");
         return imgView;
