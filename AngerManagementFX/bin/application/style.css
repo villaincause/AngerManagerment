@@ -1,0 +1,127 @@
+/* GLOBAL ROOT */
+.root {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-background-color: linear-gradient(to right, #4a90e2, #50e3c2);
+    -fx-padding: 20px;
+}
+
+/* GAME TITLE */
+.game-title {
+    -fx-font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, #000000, 5, 0.7, 0, 0);
+    -fx-padding: 10 0 20 0;
+}
+
+/* FIXED ROUND LABEL */
+.round-label {
+    -fx-font-size: 24px;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-padding: 10px;
+    -fx-alignment: center;
+    -fx-translate-y: 0px;
+}
+
+/* PLAYER UI SHARED */
+.player-ui {
+    -fx-spacing: 20px;
+    -fx-padding: 30px;
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-alignment: center;
+}
+
+/* PLAYER 1 */
+.player1-box {
+    -fx-alignment: center-left;
+    -fx-translate-x: 20px;
+}
+
+/* PLAYER 2 */
+.player2-box {
+    -fx-alignment: center-right;
+    -fx-translate-x: -20px;
+}
+
+/* NAME LABEL */
+.name-label {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+/* SCORE LABEL */
+.score-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: #ffffff;
+}
+
+/* MIND BARS */
+.mind-bar {
+    -fx-accent: #ffffff;
+    -fx-control-inner-background: transparent;
+    -fx-pref-width: 160px;
+}
+
+/* LOG MESSAGES */
+.action-message {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10;
+}
+
+/* IMAGE BUTTONS */
+.image-button {
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.6), 10, 0.5, 0, 0);
+    -fx-background-radius: 50%;
+    -fx-padding: 10;
+    -fx-border-color: white;
+    -fx-border-width: 2;
+    -fx-border-radius: 50%;
+    -fx-min-width: 160px;
+    -fx-min-height: 160px;
+    -fx-max-width: 160px;
+    -fx-max-height: 160px;
+}
+
+.image-button:hover {
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+    -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.9), 15, 0.6, 0, 0);
+}
+
+/* CONTAINER FOR IMAGE BUTTONS */
+.image-button-container {
+    -fx-alignment: center;
+    -fx-spacing: 40px;
+    -fx-padding: 30px 0 50px 0;
+}
+
+/* START & GIVE UP BUTTONS */
+.control-button {
+    -fx-font-size: 18px;
+    -fx-padding: 12 24;
+    -fx-background-color: linear-gradient(to right, #ff6a00, #ee0979);
+    -fx-text-fill: white;
+    -fx-background-radius: 30px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 5, 0.3, 0, 2);
+    -fx-cursor: hand;
+}
+
+.control-button:hover {
+    -fx-background-color: linear-gradient(to right, #ff8c00, #ff1493);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.image-button-container {
+    -fx-alignment: center;
+    -fx-spacing: 20px;
+    -fx-padding: 20px 0 40px 0; /* top, right, bottom, left */
+}
