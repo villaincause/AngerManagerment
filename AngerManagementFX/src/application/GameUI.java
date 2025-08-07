@@ -51,33 +51,33 @@ public class GameUI {
 
     public GameUI() {
     	
-    	// Action buttons container
+    	//Action buttons container
         actionButtonsBox = new HBox(20);
         actionButtonsBox.setAlignment(Pos.CENTER);
         actionButtonsBox.getStyleClass().add("image-button-container");
 
     	
-        // Root layout and start screen
+        //Root layout and start screen
         root = new BorderPane();
         createStartScreen();
         root.setCenter(startScreen);
 
-        
+        //Player Declaration
         player1 = new Player("Player 1");
         player2 = new Player("Player 2");
         
+        //Round Label
         roundLabel = new Label();
         roundLabel.getStyleClass().add("round-label");
-
         loadSounds();
         playBackgroundMusic();
         
 
-        // Message labels
+        //Message labels
         p1MessageLabel = createMessageLabel();
         p2MessageLabel = createMessageLabel();
 
-        // Move selection boxes
+        //Move selection boxes
         p1MoveBox = createMoveSelectionBox("Player 1");
         p2MoveBox = createMoveSelectionBox("Player 2");
 
@@ -98,14 +98,13 @@ public class GameUI {
     private void startGame() {
         gameStarted = true;
 
-        // RoundLabel and title
         VBox topUI = createTopUI();
         topUI.setPadding(new Insets(20, 0, 10, 0)); // optional
         topUI.getStyleClass().add("round-container");
         BorderPane.setAlignment(topUI, Pos.TOP_CENTER);
         root.setTop(topUI);
 
-        // Player UI boxes
+        //Player boxes
         VBox p1Box = player1.getUIBox();
         VBox p2Box = player2.getUIBox();
         p1Box.getStyleClass().addAll("player-ui", "player1-box");
@@ -121,7 +120,7 @@ public class GameUI {
         centerBox.setAlignment(Pos.CENTER); // important!
         root.setCenter(centerBox);
 
-        // Bottom action buttons
+        // Bottom Action buttons
         actionButtonsBox.getStyleClass().add("image-button-container");
         root.setBottom(actionButtonsBox);
 
@@ -139,20 +138,23 @@ public class GameUI {
         
 
         roundLabel.setText("Round: " + GameLogic.getRound());
+        setupKeyboardShortcuts();
+        root.requestFocus();
     }
 
 
     private VBox createTopUI() {
-        // Round label centered
         HBox roundBox = new HBox(roundLabel);
         roundBox.setAlignment(Pos.CENTER);
 
-        // Message labels for both players
-        HBox messageBox = new HBox(150, p1MessageLabel, p2MessageLabel); // spacing of 150
+        HBox messageBox = new HBox(200, p1MessageLabel, p2MessageLabel);
         messageBox.setAlignment(Pos.CENTER);
+        
+        Label controlsHint = new Label("Controls: P1 → Q / W / E    |    P2 → I / O / P");
+        controlsHint.getStyleClass().add("controls-label");
+        controlsHint.setAlignment(Pos.CENTER);
 
-        // Title on top, then round, then messages
-        VBox topBox = new VBox(10, gameTitle, roundBox, messageBox);
+        VBox topBox = new VBox(10, gameTitle, roundBox, messageBox, controlsHint);
         topBox.setAlignment(Pos.CENTER);
         return topBox;
     }
@@ -238,6 +240,37 @@ public class GameUI {
             }
         }
     }
+    
+    private void setupKeyboardShortcuts() {
+        root.setOnKeyPressed(event -> {
+            switch (event.getCode()) {
+                // Player 1
+                case Q:
+                    if (player1Move.isEmpty()) selectMove("Player 1", "rock");
+                    break;
+                case W:
+                    if (player1Move.isEmpty()) selectMove("Player 1", "paper");
+                    break;
+                case E:
+                    if (player1Move.isEmpty()) selectMove("Player 1", "scissors");
+                    break;
+
+                // Player 2
+                case I:
+                    if (player2Move.isEmpty()) selectMove("Player 2", "rock");
+                    break;
+                case O:
+                    if (player2Move.isEmpty()) selectMove("Player 2", "paper");
+                    break;
+                case P:
+                    if (player2Move.isEmpty()) selectMove("Player 2", "scissors");
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
 
     private String capitalize(String word) {
         if (word == null || word.isEmpty()) return "";
@@ -303,9 +336,7 @@ public class GameUI {
                     break;
             }
 
-            // Final score includes confidence-based bonus
-            int totalPoints = basePoints + (winner.getConfidence() / 50);
-            winner.addScore(totalPoints);
+            winner.addScore(basePoints);
 
             playSound(action);
             showMessage(label, winner.getName() + " " + action.toLowerCase() + "ed " + loser.getName() + "!");
@@ -378,7 +409,6 @@ public class GameUI {
             ButtonType closeButton = new ButtonType("Close Game", ButtonBar.ButtonData.OK_DONE);
             alert.getButtonTypes().setAll(closeButton);
 
-            // 🔧 Make sure alert is shown above the main game window
             if (primaryStage != null) {
                 alert.initOwner(primaryStage);
             }
